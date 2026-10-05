@@ -1,4 +1,4 @@
-import {Activity,ArrowRight,BookOpen,Brain,Check,Compass,Expand,Heart,Layers3,RotateCcw,Search,SunMoon,Users,X,ZoomIn,ZoomOut} from 'lucide-react';
+import {Activity,ArrowRight,BookOpen,Brain,Check,Compass,Expand,Heart,Layers3,Menu,RotateCcw,Search,SunMoon,Users,X,ZoomIn,ZoomOut} from 'lucide-react';
 import {useEffect,useState} from 'react';
 
 interface LandingPageProps {onOpenExplorer:()=>void;onZoomIn:()=>void;onZoomOut:()=>void;onReset:()=>void}
@@ -12,21 +12,24 @@ const sectionContent={
 } satisfies Record<LandingSection,{eyebrow:string;title:string;lead:string;items:{icon:typeof Activity;title:string;text:string}[]}>;
 
 export default function LandingPage({onOpenExplorer,onZoomIn,onZoomOut,onReset}:LandingPageProps){
- const [section,setSection]=useState<LandingSection|null>(null);
+ const [section,setSection]=useState<LandingSection|null>(null),[mobileMenuOpen,setMobileMenuOpen]=useState(false);
  useEffect(()=>{if(!section)return;const close=(event:KeyboardEvent)=>{if(event.key==='Escape')setSection(null);};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close);},[section]);
- const enterExplorer=()=>{setSection(null);onOpenExplorer();};
+ const enterExplorer=()=>{setSection(null);setMobileMenuOpen(false);onOpenExplorer();};
+ const showSection=(next:LandingSection)=>{setSection(next);setMobileMenuOpen(false);};
  return <div className="landing-home">
   <header className="landing-header">
    <a className="landing-brand" href="/" aria-label="BMG Atlas home"><span className="landing-logo-crop"><img src="/bmg-atlas-logo.png" alt=""/></span><span>BMG Atlas</span></a>
-   <nav className="landing-nav" aria-label="Main navigation"><button type="button" onClick={()=>setSection('features')}>Features</button><button type="button" onClick={enterExplorer}>Anatomy</button><button type="button" onClick={()=>setSection('education')}>Education</button><button type="button" onClick={()=>setSection('about')}>About</button></nav>
+   <nav className="landing-nav" aria-label="Main navigation"><button type="button" onClick={()=>showSection('features')}>Features</button><button type="button" onClick={enterExplorer}>Anatomy</button><button type="button" onClick={()=>showSection('education')}>Education</button><button type="button" onClick={()=>showSection('about')}>About</button></nav>
+   <button type="button" className="landing-mobile-menu-toggle" aria-label={mobileMenuOpen?'Close navigation':'Open navigation'} aria-expanded={mobileMenuOpen} onClick={()=>setMobileMenuOpen(open=>!open)}>{mobileMenuOpen?<X size={19}/>:<Menu size={19}/>}</button>
    <button type="button" className="landing-cta landing-cta-small" onClick={enterExplorer}>Get Started <ArrowRight size={17}/></button>
   </header>
+  {mobileMenuOpen&&<nav className="landing-mobile-menu" aria-label="Main navigation"><button type="button" onClick={()=>showSection('features')}>Features</button><button type="button" onClick={enterExplorer}>Anatomy</button><button type="button" onClick={()=>showSection('education')}>Education</button><button type="button" onClick={()=>showSection('about')}>About</button></nav>}
   <section className="landing-hero" aria-labelledby="landing-title">
    <div className="landing-copy">
     <div className="landing-overline"><span/> INTERACTIVE ANATOMY</div>
     <h1 id="landing-title"><span>BMG</span> Atlas</h1>
     <p className="landing-subtitle">Explore human anatomy in 3D</p>
-    <p className="landing-description">A detailed anatomy explorer for learners, educators, and curious minds. Discover the human body one structure at a time.</p>
+    <p className="landing-description"><span className="desktop-description">A detailed anatomy explorer for learners, educators, and curious minds. Discover the human body one structure at a time.</span><span className="mobile-description">Explore human anatomy structure by structure.</span></p>
     <div className="landing-actions"><button type="button" className="landing-cta" onClick={enterExplorer}>Get Started <ArrowRight size={18}/></button><button type="button" className="landing-cta-secondary" onClick={enterExplorer}>Explore Anatomy</button></div>
    </div>
    <div className="landing-orbit" aria-hidden="true"/>
