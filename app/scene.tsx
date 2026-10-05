@@ -83,7 +83,7 @@ export default function AnatomyScene({atlas,state,theme,hero=false,zoom=0,onSele
    const distance=T.MathUtils.lerp(normalDistance,Math.max(.2,atlasDistance),extent);if(extent>.8)view='front';
    const cameraView=latestHero.current?'back':view;
    const direction=cameraView==='front'?new T.Vector3(0,.02,1):cameraView==='back'?new T.Vector3(0,.02,-1):cameraView==='side'?new T.Vector3(1,.02,0):new T.Vector3(.35,.06,1).normalize();
-    const focus=T.MathUtils.smoothstep(extent,0,1);const targetX=el.clientWidth>767?(latestHero.current?-packingWidth*.24:-packingWidth*.12*focus):0;const targetY=mobile?.85:T.MathUtils.lerp(.68,.85,focus);
+    const focus=T.MathUtils.smoothstep(extent,0,1);const targetX=el.clientWidth>767?(latestHero.current?packingWidth*.24:-packingWidth*.12*focus):0;const targetY=mobile?.85:T.MathUtils.lerp(.68,.85,focus);
    controls.target.set(targetX,targetY,0);camera.position.copy(controls.target).addScaledVector(direction,distance);controls.update();dirty=true;
   };
   const resize=()=>{layoutKey='';lastState=null;renderer.setPixelRatio(Math.min(devicePixelRatio,el.clientWidth<768||el.clientHeight<600?1.5:2));camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();renderer.setSize(el.clientWidth,el.clientHeight);fit(latest.current.view,amount);};const observer=new ResizeObserver(resize);observer.observe(el);
