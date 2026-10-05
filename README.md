@@ -1,8 +1,8 @@
-# BMG -Human Atlas
+# BMG Atlas
 
 BMG -Human Atlas is an interactive 3D anatomy explorer built with React, Three.js, and shadcn/ui. Switch between adult male and female reference models in the same viewer, inspect 2,234 or 3,004 individually selectable structures, explore their anatomical systems, and search named concepts.
 
-The upstream project provides the original demo; this BMG edition runs locally.
+The BMG Atlas home page presents the interactive 3D viewer with a dark burgundy and ivory visual theme. Open the explorer from either Get Started button; Telegram support is available at @BMG009.
 
 ## Explore
 

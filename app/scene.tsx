@@ -7,17 +7,17 @@ import {createExplosionLayout} from './explosion-layout';
 import {decodeModelResponse} from './model-download';
 import {PointerTap} from './pointer-tap';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
-interface Props {atlas:Atlas;state:SceneState;theme:'light'|'dark';onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void}
-export default function AnatomyScene({atlas,state,theme,onSelect,onProgress,onError}:Props){
+interface Props {atlas:Atlas;state:SceneState;theme:'light'|'dark';hero?:boolean;zoom?:number;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void}
+export default function AnatomyScene({atlas,state,theme,hero=false,zoom=0,onSelect,onProgress,onError}:Props){
  const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect);
- const latestTheme=useRef(theme);latest.current=state;select.current=onSelect;latestTheme.current=theme;
+ const latestTheme=useRef(theme),latestHero=useRef(hero),latestZoom=useRef(zoom);latest.current=state;select.current=onSelect;latestTheme.current=theme;latestHero.current=hero;latestZoom.current=zoom;
  useEffect(()=>{
   const el=host.current!;let disposed=false,frame=0,dirty=true,ready=false,lastView='',lastReset=-1,lastIsolate='',layoutKey='',amount=0;
   let lastState:SceneState|null=null;
   const abort=new AbortController();
   let renderer:T.WebGLRenderer;
   try{renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});}catch{onError('This browser could not start the 3D viewer. Please try a browser with WebGL enabled.');return;}
-  renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<768?1.5:2));renderer.setClearColor(theme==='dark'?'#151719':'#f2f3f3');renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;el.appendChild(renderer.domElement);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<768?1.5:2));renderer.setClearColor(theme==='dark'?'#100f10':'#f2f3f3');renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;el.appendChild(renderer.domElement);
   renderer.domElement.setAttribute('aria-label','Interactive human anatomy. Drag to orbit, pinch or scroll to zoom, and tap a structure to inspect it.');
   const scene=new T.Scene(),camera=new T.PerspectiveCamera(34,1,.005,100),controls=new OrbitControls(camera,renderer.domElement);
   camera.position.set(1.4,1.05,3.6);controls.target.set(0,.85,0);controls.enableDamping=true;controls.dampingFactor=.085;controls.minDistance=.07;controls.maxDistance=40;controls.maxPolarAngle=Math.PI*.96;controls.addEventListener('change',()=>{dirty=true;});
@@ -82,7 +82,7 @@ export default function AnatomyScene({atlas,state,theme,onSelect,onProgress,onEr
    const reservedHeight=mobile?350:270;const availableAspect=Math.max(.35,(el.clientWidth-(mobile?40:340))/Math.max(160,el.clientHeight-reservedHeight));const atlasDistance=Math.max(packingHeight,packingWidth/availableAspect)/(2*Math.tan(T.MathUtils.degToRad(camera.fov/2)))*(el.clientHeight/Math.max(160,el.clientHeight-reservedHeight))*1.08;
    const distance=T.MathUtils.lerp(normalDistance,Math.max(.2,atlasDistance),extent);if(extent>.8)view='front';
    const direction=view==='front'?new T.Vector3(0,.02,1):view==='back'?new T.Vector3(0,.02,-1):view==='side'?new T.Vector3(1,.02,0):new T.Vector3(.35,.06,1).normalize();
-   const focus=T.MathUtils.smoothstep(extent,0,1);const targetX=el.clientWidth>767?-packingWidth*.12*focus:0;const targetY=mobile?.85:T.MathUtils.lerp(.68,.85,focus);
+    const focus=T.MathUtils.smoothstep(extent,0,1);const targetX=el.clientWidth>767?(latestHero.current?-packingWidth*.24:-packingWidth*.12*focus):0;const targetY=mobile?.85:T.MathUtils.lerp(.68,.85,focus);
    controls.target.set(targetX,targetY,0);camera.position.copy(controls.target).addScaledVector(direction,distance);controls.update();dirty=true;
   };
   const resize=()=>{layoutKey='';lastState=null;renderer.setPixelRatio(Math.min(devicePixelRatio,el.clientWidth<768||el.clientHeight<600?1.5:2));camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();renderer.setSize(el.clientWidth,el.clientHeight);fit(latest.current.view,amount);};const observer=new ResizeObserver(resize);observer.observe(el);
@@ -97,10 +97,11 @@ export default function AnatomyScene({atlas,state,theme,onSelect,onProgress,onEr
    if(found<0&&amount>.45)found=findTarget(e.clientX-rect.left,e.clientY-rect.top,e.pointerType==='touch'?24:16);if(found>=0){hover.hidden=true;select.current(atlas.parts[found].id);}
   };
   renderer.domElement.addEventListener('pointerdown',down);renderer.domElement.addEventListener('pointermove',move);renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',cancel);
-  const clock=new T.Clock();let lastExtent=-1,renderedTheme=theme;
+  const clock=new T.Clock();let lastExtent=-1,renderedTheme=theme,lastHero=hero,lastZoom=zoom;
   const animate=()=>{
    if(disposed)return;frame=requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05),s=latest.current;
-   if(renderedTheme!==latestTheme.current){renderedTheme=latestTheme.current;const dark=renderedTheme==='dark';renderer.setClearColor(dark?'#151719':'#f2f3f3');groundMaterial.color.setHex(dark?0x191b1e:0xd5d9dc);platformMaterial.color.setHex(dark?0x111316:0xeeeeec);ringMaterial.color.setHex(dark?0x89939b:0x8c969f);innerRingMaterial.color.setHex(dark?0x606a72:0xa4aeb8);dirty=true;}
+    if(renderedTheme!==latestTheme.current){renderedTheme=latestTheme.current;const dark=renderedTheme==='dark';renderer.setClearColor(dark?'#100f10':'#f2f3f3');groundMaterial.color.setHex(dark?0x171416:0xd5d9dc);platformMaterial.color.setHex(dark?0x131114:0xeeeeec);ringMaterial.color.setHex(dark?0x9b5866:0x8c969f);innerRingMaterial.color.setHex(dark?0x70404a:0xa4aeb8);dirty=true;}
+    if(lastHero!==latestHero.current){lastHero=latestHero.current;fit(s.view,amount);dirty=true;}
    const changed=lastState?.visible!==s.visible||lastState?.selected!==s.selected||lastState?.isolate!==s.isolate;
    const moving=Math.abs(amount-s.explode)>.0001;
    if(moving){amount=T.MathUtils.damp(amount,s.explode,8,dt);dirty=true;}
@@ -122,7 +123,8 @@ export default function AnatomyScene({atlas,state,theme,onSelect,onProgress,onEr
     if(Number.isFinite(lowestVisibleY)){const stageTop=Math.min(-.002,lowestVisibleY-.01);platform.position.y=stageTop-.014;ground.position.y=stageTop-.019;ring.position.y=innerRing.position.y=stageTop+.0005;}
     partTexture.needsUpdate=true;selectionTexture.needsUpdate=true;markerGeometry.attributes.position.needsUpdate=true;lastState=s;lastExtent=amount;dirty=true;
    }
-   if(s.view!==lastView||s.reset!==lastReset){fit(s.view,amount);lastView=s.view;lastReset=s.reset;}
+    if(s.view!==lastView||s.reset!==lastReset){const resetChanged=s.reset!==lastReset;fit(s.view,amount);lastView=s.view;lastReset=s.reset;if(resetChanged)lastZoom=latestZoom.current;}
+    const requestedZoom=latestZoom.current;if(requestedZoom!==lastZoom){const steps=Math.min(12,Math.abs(requestedZoom-lastZoom));for(let i=0;i<steps;i++)requestedZoom>lastZoom?controls.dollyIn(1.2):controls.dollyOut(1.2);lastZoom=requestedZoom;dirty=true;}
    if(moving&&!s.isolate)fit(amount>.5?'front':s.view,Math.max(0,(amount-.3)/.7));
    const isolateKey=s.isolate?s.selected.join(',')+':'+s.reset+':'+s.inspectorOpen+':'+camera.aspect:'';
    if(isolateKey!==lastIsolate||(s.isolate&&moving)){
