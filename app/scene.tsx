@@ -81,9 +81,9 @@ export default function AnatomyScene({atlas,state,theme,hero=false,zoom=0,onSele
    const aspect=camera.aspect,mobile=el.clientWidth<768,normalDistance=mobile?Math.max(4.5,1.8*el.clientHeight/Math.max(160,el.clientHeight-350)/(2*Math.tan(T.MathUtils.degToRad(camera.fov/2)))):4;
    const reservedHeight=mobile?350:270;const availableAspect=Math.max(.35,(el.clientWidth-(mobile?40:340))/Math.max(160,el.clientHeight-reservedHeight));const atlasDistance=Math.max(packingHeight,packingWidth/availableAspect)/(2*Math.tan(T.MathUtils.degToRad(camera.fov/2)))*(el.clientHeight/Math.max(160,el.clientHeight-reservedHeight))*1.08;
    const distance=T.MathUtils.lerp(normalDistance,Math.max(.2,atlasDistance),extent);if(extent>.8)view='front';
-   const cameraView=latestHero.current?'back':view;
+   const cameraView=latestHero.current?'front':view;
    const direction=cameraView==='front'?new T.Vector3(0,.02,1):cameraView==='back'?new T.Vector3(0,.02,-1):cameraView==='side'?new T.Vector3(1,.02,0):new T.Vector3(.35,.06,1).normalize();
-    const focus=T.MathUtils.smoothstep(extent,0,1);const targetX=el.clientWidth>767?(latestHero.current?packingWidth*.08:-packingWidth*.12*focus):0;const targetY=mobile ? .85 : latestHero.current ? .9 : T.MathUtils.lerp(.68,.85,focus);
+    const focus=T.MathUtils.smoothstep(extent,0,1);const targetX=el.clientWidth>767?(latestHero.current?-packingWidth*.08:-packingWidth*.12*focus):0;const targetY=mobile ? .85 : latestHero.current ? .9 : T.MathUtils.lerp(.68,.85,focus);
    controls.target.set(targetX,targetY,0);camera.position.copy(controls.target).addScaledVector(direction,distance);controls.update();dirty=true;
   };
   const resize=()=>{layoutKey='';lastState=null;renderer.setPixelRatio(Math.min(devicePixelRatio,el.clientWidth<768||el.clientHeight<600?1.5:2));camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();renderer.setSize(el.clientWidth,el.clientHeight);fit(latest.current.view,amount);};const observer=new ResizeObserver(resize);observer.observe(el);
