@@ -221,6 +221,22 @@ h1 .edition{font-family:inherit;font-weight:500;font-size:10px;letter-spacing:.0
 .landing-hero{position:absolute;inset:108px 0 112px;z-index:1;pointer-events:none}
 .landing-mobile-menu-toggle{display:none}.mobile-description{display:none}
 .footer-links{display:flex;flex-direction:column;align-items:flex-end;gap:12px}.footer-links .support-link{min-height:24px}.footer-links .telegram-icon circle{fill:#26242a}.footer-links .telegram-icon path{fill:#f1f0ff}
+.landing-header{animation:landing-enter-down .65s cubic-bezier(.22,1,.36,1) both}
+.landing-copy>.landing-overline{animation:landing-enter-up .58s .08s cubic-bezier(.22,1,.36,1) both}
+.landing-copy>h1{animation:landing-enter-up .66s .16s cubic-bezier(.22,1,.36,1) both}
+.landing-copy>.landing-subtitle{animation:landing-enter-up .66s .23s cubic-bezier(.22,1,.36,1) both}
+.landing-copy>.landing-description{animation:landing-enter-up .66s .3s cubic-bezier(.22,1,.36,1) both}
+.landing-copy>.landing-actions{animation:landing-enter-up .66s .38s cubic-bezier(.22,1,.36,1) both}
+.landing-orbit{animation:landing-orbit-in .9s .08s ease-out both,landing-orbit-glow 12s 1s ease-in-out infinite alternate}
+.landing-systems{animation:landing-enter-side .7s .24s cubic-bezier(.22,1,.36,1) both}
+.landing-features>div{animation:landing-enter-up .6s .4s cubic-bezier(.22,1,.36,1) both}
+.landing-features>div:nth-child(2){animation-delay:.49s}.landing-features>div:nth-child(3){animation-delay:.58s}
+.landing-telegram{animation:landing-enter-up .55s .55s cubic-bezier(.22,1,.36,1) both}
+@keyframes landing-enter-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes landing-enter-down{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes landing-enter-side{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+@keyframes landing-orbit-in{from{opacity:0}to{opacity:1}}
+@keyframes landing-orbit-glow{from{box-shadow:0 0 0 22px #8f1d3c09,0 0 0 54px #8f1d3c06,0 0 105px #8c17350e}to{box-shadow:0 0 0 22px #8f1d3c0d,0 0 0 54px #8f1d3c09,0 0 135px #8c173524}}
 .landing-copy{position:absolute;z-index:1;left:5.5vw;top:17%;width:min(570px,46vw);pointer-events:auto}
 .landing-overline{display:flex;align-items:center;gap:11px;color:#c7b8b6;font-size:11px;font-weight:600;letter-spacing:.24em}
 .landing-overline span{width:7px;height:7px;border-radius:50%;background:#cf3958;box-shadow:0 0 14px #d63b5d90}
